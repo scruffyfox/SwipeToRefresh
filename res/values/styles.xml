@@ -1,4 +1,10 @@
 <resources>
+	<style name="Theme.PullRefreshDefaults" parent="android:Theme">
+		<item name="ptr_text_style">@style/RefreshProgressText</item>
+		<item name="ptr_progress_style">@style/RefreshProgressThemeLight</item>
+		<item name="ptr_progress_inderteminate_style">@style/RefreshProgressInderterminateThemeLight</item>
+	</style>
+
 	<style name="RefreshProgressInderterminateThemeLight" parent="android:Widget.ProgressBar.Horizontal">
 		<item name="android:indeterminateDrawable">@drawable/progress_indeterminate_horizontal_holo_light</item>
 		<item name="android:minHeight">4dip</item>
@@ -12,6 +18,6 @@
 	</style>
 	
 	<style name="RefreshProgressText">
-		<item name="android:color">#ff000000</item>
+		<item name="android:textColor">#ffffffff</item>
 	</style>
 </resources>

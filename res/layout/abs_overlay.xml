@@ -16,7 +16,7 @@
 		android:textStyle="bold"
 		android:layout_centerInParent="true"
 		android:id="@+id/refresh_text"
-		style="@style/RefreshProgressText"
+		style="?attr/ptr_text_style"
 	/>
 	
 	<FrameLayout
