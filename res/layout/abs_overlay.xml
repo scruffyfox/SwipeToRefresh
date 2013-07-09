@@ -8,7 +8,6 @@
 >
 	<TextView
 		android:text="@string/ptr_pull"
-		android:textColor="@style/RefreshProgressText"
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content"
 		android:singleLine="true"
@@ -17,6 +16,7 @@
 		android:textStyle="bold"
 		android:layout_centerInParent="true"
 		android:id="@+id/refresh_text"
+		style="@style/RefreshProgressText"
 	/>
 	
 	<FrameLayout
