@@ -233,10 +233,10 @@ public class RefreshHelper implements OnOverScrollListener
 
 		if (abRoot != null)
 		{
-			View overlay = LayoutInflater.from(ctx).inflate(R.layout.abs_overlay, null, false);
+			View overlay = LayoutInflater.from(ctx).inflate(R.layout.abs_overlay, abRoot, false);
 			abRoot.addView(overlay);
 
-			View progressOverlay = LayoutInflater.from(ctx).inflate(R.layout.abs_overlay_progress, null, false);
+			View progressOverlay = LayoutInflater.from(ctx).inflate(R.layout.abs_overlay_progress, abRoot, false);
 			abRoot.addView(progressOverlay);
 
 			RefreshHelper helper = new RefreshHelper(overlay, progressOverlay, abRoot.getChildAt(0));
