@@ -13,6 +13,7 @@ public class RefreshableScrollView extends ScrollView implements View.OnTouchLis
 	private final Context mContext;
 	private int mScrollState;
 	public RefreshDelegate refreshDelegate;
+	private boolean canRefresh = true;
 
 	public RefreshableScrollView(Context context)
 	{
@@ -28,6 +29,16 @@ public class RefreshableScrollView extends ScrollView implements View.OnTouchLis
 		this.mContext = context;
 
 		init();
+	}
+
+	public void setCanRefresh(boolean canRefresh)
+	{
+		this.canRefresh = canRefresh;
+	}
+
+	public boolean getCanRefresh()
+	{
+		return this.canRefresh;
 	}
 
 	public int getScrollState()
@@ -61,7 +72,11 @@ public class RefreshableScrollView extends ScrollView implements View.OnTouchLis
 
 	@Override public final boolean onTouch(View view, MotionEvent event)
 	{
-		refreshDelegate.onTouch(view, event);
+		if (canRefresh)
+		{
+			refreshDelegate.onTouch(view, event);
+		}
+
 		return false;
 	}
 
