@@ -186,7 +186,8 @@ public class RefreshHelper implements OnOverScrollListener
 	{
 		ViewGroup abRoot = null;
 
-		int id = ctx.getResources().getIdentifier("abs__action_bar_container", "id", ctx.getPackageName());
+
+		int id = ctx.getResources().getIdentifier("action_bar_container", "id", ctx.getPackageName());
 
 		if (id > 0)
 		{
@@ -219,7 +220,7 @@ public class RefreshHelper implements OnOverScrollListener
 	{
 		ViewGroup abRoot = null;
 
-		int id = ctx.getResources().getIdentifier("abs__action_bar_container", "id", ctx.getPackageName());
+		int id = ctx.getResources().getIdentifier("action_bar_container", "id", ctx.getPackageName());
 
 		if (id > 0)
 		{
