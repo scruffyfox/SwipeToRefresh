@@ -182,10 +182,47 @@ public class RefreshHelper implements OnOverScrollListener
 		return retView;
 	}
 
-	public static RefreshHelper wrapRefreshable(Activity ctx, RefreshableListView list, OnRefreshListener l)
+	/**
+	 * You can call this at the start of your activity to reset any current set refresh bar
+	 * @param ctx
+	 */
+	public static void reset(Activity ctx)
 	{
 		ViewGroup abRoot = null;
 
+		int id = ctx.getResources().getIdentifier("action_bar_container", "id", ctx.getPackageName());
+
+		if (id > 0)
+		{
+			abRoot = (ViewGroup)ctx.getWindow().getDecorView().findViewById(id);
+		}
+
+		if (id == 0 || abRoot == null)
+		{
+			abRoot = (ViewGroup)findActionBar(ctx.getWindow());
+		}
+
+		if (abRoot != null)
+		{
+			View view = abRoot.findViewById(R.id.refresh_view);
+			while (view != null)
+			{
+				abRoot.removeView(view);
+				view = abRoot.findViewById(R.id.refresh_view);
+			}
+
+			View inderterminate = abRoot.findViewById(R.id.refresh_progress_inderterminate);
+			while (inderterminate != null)
+			{
+				abRoot.removeView(inderterminate);
+				inderterminate = abRoot.findViewById(R.id.refresh_progress_inderterminate);
+			}
+		}
+	}
+
+	public static RefreshHelper wrapRefreshable(Activity ctx, RefreshableListView list, OnRefreshListener l)
+	{
+		ViewGroup abRoot = null;
 
 		int id = ctx.getResources().getIdentifier("action_bar_container", "id", ctx.getPackageName());
 
