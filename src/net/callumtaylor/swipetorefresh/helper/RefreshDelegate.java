@@ -1,6 +1,8 @@
 package net.callumtaylor.swipetorefresh.helper;
 
 import net.callumtaylor.swipetorefresh.view.OnOverScrollListener;
+import net.callumtaylor.swipetorefresh.view.RefreshableListView;
+import net.callumtaylor.swipetorefresh.view.RefreshableScrollView;
 import android.content.Context;
 import android.util.DisplayMetrics;
 import android.view.Display;
@@ -9,6 +11,11 @@ import android.view.View;
 import android.view.ViewConfiguration;
 import android.view.WindowManager;
 
+/**
+ * This is the refresh delegate responsible for handling the touch events
+ * from the {@link RefreshableListView} and {@link RefreshableScrollView}
+ * classes.
+ */
 public class RefreshDelegate
 {
 	private final DisplayMetrics mDM;
@@ -33,9 +40,9 @@ public class RefreshDelegate
 		display.getMetrics(mDM);
 	}
 
-	public void setScrollDeletage(ScrollDelegate delegage)
+	public void setScrollDeletage(ScrollDelegate delegate)
 	{
-		this.scrollDelegate = delegage;
+		this.scrollDelegate = delegate;
 	}
 
 	public void setOnOverScrollListener(OnOverScrollListener l)

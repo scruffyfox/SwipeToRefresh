@@ -13,6 +13,16 @@ import android.view.animation.AccelerateInterpolator;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+/**
+ * This is the refresh helper class which you could call to
+ * wrap your refreshable views and activity to.
+ *
+ * You can call {@link showHelper} to show the indeterminate progress
+ * or {@link hideHelper} to hide. This is useful when having more than one
+ * refreshable list fragments in a view pager, call show/hide on the
+ * relevant fragment when switching page to prevent multiple refreshables
+ * from showing.
+ */
 public class RefreshHelper implements OnOverScrollListener
 {
 	private final View ptrOverlay;
