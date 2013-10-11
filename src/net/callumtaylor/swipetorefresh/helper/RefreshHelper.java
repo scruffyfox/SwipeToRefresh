@@ -40,6 +40,16 @@ public class RefreshHelper implements OnOverScrollListener
 		ptrProgressBar.setProgress(0);
 	}
 
+	public void setRefreshing(boolean refreshing)
+	{
+		this.refreshing = refreshing;
+	}
+
+	public boolean isRefreshing()
+	{
+		return refreshing;
+	}
+
 	public void hideHelper()
 	{
 		if (isRefreshing())
@@ -48,9 +58,12 @@ public class RefreshHelper implements OnOverScrollListener
 		}
 	}
 
-	public boolean isRefreshing()
+	public void showHelper()
 	{
-		return refreshing;
+		if (isRefreshing())
+		{
+			ptrInderterminateProgressBar.setVisibility(View.VISIBLE);
+		}
 	}
 
 	@Override public void onBeginRefresh()
@@ -61,6 +74,16 @@ public class RefreshHelper implements OnOverScrollListener
 
 	@Override public void onRefresh()
 	{
+		if (scrollView != null)
+		{
+			scrollView.setCanRefresh(false);
+		}
+
+		if (listView != null)
+		{
+			listView.setCanRefresh(false);
+		}
+
 		refreshing = true;
 		ptrProgressBar.setVisibility(View.GONE);
 		ptrInderterminateProgressBar.setVisibility(View.VISIBLE);
@@ -95,6 +118,16 @@ public class RefreshHelper implements OnOverScrollListener
 		}
 
 		resetOverlay();
+
+		if (scrollView != null)
+		{
+			scrollView.setCanRefresh(true);
+		}
+
+		if (listView != null)
+		{
+			listView.setCanRefresh(true);
+		}
 	}
 
 	private void resetOverlay()
@@ -134,19 +167,6 @@ public class RefreshHelper implements OnOverScrollListener
 	{
 		this.scrollView = l;
 		this.scrollView.setOnOverScrollListener(this);
-	}
-
-	public void setRefreshing(boolean refreshing)
-	{
-		this.refreshing = refreshing;
-	}
-
-	public void showHelper()
-	{
-		if (isRefreshing())
-		{
-			ptrInderterminateProgressBar.setVisibility(View.VISIBLE);
-		}
 	}
 
 	public static View findActionBar(Window w)
@@ -222,16 +242,9 @@ public class RefreshHelper implements OnOverScrollListener
 
 	public static RefreshHelper wrapRefreshable(Activity ctx, RefreshableListView list, OnRefreshListener l)
 	{
-		ViewGroup abRoot = null;
+		ViewGroup abRoot;
 
-		int id = ctx.getResources().getIdentifier("action_bar_container", "id", ctx.getPackageName());
-
-		if (id > 0)
-		{
-			abRoot = (ViewGroup)ctx.getWindow().getDecorView().findViewById(id);
-		}
-
-		if (id == 0 || abRoot == null)
+		if ((abRoot = (ViewGroup)ctx.getWindow().getDecorView().findViewById(R.id.action_bar_container)) == null)
 		{
 			abRoot = (ViewGroup)findActionBar(ctx.getWindow());
 		}
@@ -255,26 +268,19 @@ public class RefreshHelper implements OnOverScrollListener
 
 	public static RefreshHelper wrapRefreshable(Activity ctx, RefreshableScrollView list, OnRefreshListener l)
 	{
-		ViewGroup abRoot = null;
+		ViewGroup abRoot;
 
-		int id = ctx.getResources().getIdentifier("action_bar_container", "id", ctx.getPackageName());
-
-		if (id > 0)
-		{
-			abRoot = (ViewGroup)ctx.getWindow().getDecorView().findViewById(id);
-		}
-
-		if (id == 0 || abRoot == null)
+		if ((abRoot = (ViewGroup)ctx.getWindow().getDecorView().findViewById(R.id.action_bar_container)) == null)
 		{
 			abRoot = (ViewGroup)findActionBar(ctx.getWindow());
 		}
 
 		if (abRoot != null)
 		{
-			View overlay = LayoutInflater.from(ctx).inflate(R.layout.abs_overlay, abRoot, false);
+			View overlay = LayoutInflater.from(ctx).inflate(R.layout.abs_overlay, null, false);
 			abRoot.addView(overlay);
 
-			View progressOverlay = LayoutInflater.from(ctx).inflate(R.layout.abs_overlay_progress, abRoot, false);
+			View progressOverlay = LayoutInflater.from(ctx).inflate(R.layout.abs_overlay_progress, null, false);
 			abRoot.addView(progressOverlay);
 
 			RefreshHelper helper = new RefreshHelper(overlay, progressOverlay, abRoot.getChildAt(0));
