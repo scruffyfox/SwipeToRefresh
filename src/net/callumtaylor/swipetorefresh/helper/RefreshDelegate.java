@@ -24,9 +24,10 @@ public class RefreshDelegate
 	private ScrollDelegate scrollDelegate;
 	private OnOverScrollListener onOverScrollListener;
 
+	private int refreshCount = 0;
 	private int mTouchSlop;
 	private float mInitialMotionY, mLastMotionY;
-	private boolean mIsBeingDragged, mIsRefreshing, mIsHandlingTouchEvent, mCanHandleEvent;
+	private boolean mIsBeingDragged, mIsRefreshing, mIsHandlingTouchEvent;
 
 	public RefreshDelegate(Context context, ScrollDelegate scrollDelegate)
 	{
@@ -66,6 +67,7 @@ public class RefreshDelegate
 		}
 		else
 		{
+			refreshCount++;
 			refresh();
 		}
 	}
@@ -112,6 +114,8 @@ public class RefreshDelegate
 		{
 			case MotionEvent.ACTION_MOVE:
 			{
+				if (refreshCount > 0) return false;
+
 				if (mIsRefreshing)
 				{
 					if (!scrollDelegate.isScrolledToTop())
@@ -185,13 +189,11 @@ public class RefreshDelegate
 				// If we're already refreshing, ignore
 				if (canRefresh(true) && scrollDelegate.isScrolledToTop())
 				{
-					mCanHandleEvent = true;
 					mIsHandlingTouchEvent = false;
 					mInitialMotionY = event.getY();
 				}
 				else
 				{
-					mCanHandleEvent = false;
 					mIsHandlingTouchEvent = false;
 				}
 
@@ -201,6 +203,7 @@ public class RefreshDelegate
 			case MotionEvent.ACTION_CANCEL:
 			case MotionEvent.ACTION_UP:
 			{
+				refreshCount = 0;
 				resetTouch();
 				break;
 			}
@@ -243,7 +246,6 @@ public class RefreshDelegate
 			onPullEnded();
 		}
 
-		mCanHandleEvent = false;
 		mIsHandlingTouchEvent = false;
 		mInitialMotionY = mLastMotionY = 0f;
 
@@ -258,14 +260,12 @@ public class RefreshDelegate
 	 */
 	public void startRefresh()
 	{
-		//onPullStarted();
 		refresh();
 	}
 
 	public int densityPixel(int dp)
 	{
 		int pixels = (int)(dp * mDM.density);
-
 		return pixels;
 	}
 

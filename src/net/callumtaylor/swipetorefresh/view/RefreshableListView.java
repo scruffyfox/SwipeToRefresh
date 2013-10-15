@@ -62,7 +62,7 @@ public class RefreshableListView extends ListView implements View.OnTouchListene
 		{
 			return true;
 		}
-		else if (touchDownPos <= 2)
+		else if (touchDownPos < 1)
 		{
 			return true;
 		}
@@ -100,10 +100,9 @@ public class RefreshableListView extends ListView implements View.OnTouchListene
 
 	@Override public final boolean onTouch(View view, MotionEvent event)
 	{
-		if ((event.getAction() == MotionEvent.ACTION_DOWN && touchDownPos >= Integer.MAX_VALUE)
+		if ((event.getAction() == MotionEvent.ACTION_DOWN)
 		|| (event.getAction() == MotionEvent.ACTION_MOVE && touchDownPos >= Integer.MAX_VALUE))
 		{
-			touchDownPos = getFirstVisiblePosition();
 			touchDownPos = getFirstVisiblePosition() + getHeaderViewsCount();
 		}
 		else if (event.getAction() == MotionEvent.ACTION_CANCEL || event.getAction() == MotionEvent.ACTION_UP)
