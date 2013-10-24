@@ -132,11 +132,13 @@ public class RefreshHelper implements OnOverScrollListener
 		if (scrollView != null)
 		{
 			scrollView.setCanRefresh(true);
+			scrollView.onRefreshComplete();
 		}
 
 		if (listView != null)
 		{
 			listView.setCanRefresh(true);
+			listView.onRefreshComplete();
 		}
 	}
 

@@ -76,7 +76,8 @@ public class RefreshDelegate
 	{
 		if (!mIsRefreshing)
 		{
-			onRefreshComplete();
+			onOverScrollListener.onReset();
+			//onRefreshComplete();
 		}
 	}
 
@@ -95,7 +96,7 @@ public class RefreshDelegate
 	{
 		if (onOverScrollListener != null)
 		{
-			onOverScrollListener.onReset();
+			//onOverScrollListener.onReset();
 		}
 
 		mIsRefreshing = false;
