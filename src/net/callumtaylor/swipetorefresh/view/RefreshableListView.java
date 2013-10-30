@@ -10,7 +10,6 @@ import android.widget.ListView;
 
 public class RefreshableListView extends ListView implements View.OnTouchListener, ScrollDelegate
 {
-	private final Context mContext;
 	private boolean mBlockLayoutChildren = false;
 	private boolean canRefresh = true;
 	private int touchDownPos = Integer.MAX_VALUE;
@@ -19,16 +18,12 @@ public class RefreshableListView extends ListView implements View.OnTouchListene
 	public RefreshableListView(Context context)
 	{
 		super(context);
-		this.mContext = context;
-
 		init();
 	}
 
 	public RefreshableListView(Context context, AttributeSet attrs)
 	{
 		super(context, attrs);
-		this.mContext = context;
-
 		init();
 	}
 
@@ -52,7 +47,7 @@ public class RefreshableListView extends ListView implements View.OnTouchListene
 
 	private void init()
 	{
-		refreshDelegate = new RefreshDelegate(mContext, this);
+		refreshDelegate = new RefreshDelegate(getContext(), this);
 		setOnTouchListener(this);
 	}
 

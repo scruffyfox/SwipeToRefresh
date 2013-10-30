@@ -5,6 +5,7 @@ import net.callumtaylor.swipetorefresh.view.OnOverScrollListener;
 import net.callumtaylor.swipetorefresh.view.RefreshableListView;
 import net.callumtaylor.swipetorefresh.view.RefreshableScrollView;
 import android.app.Activity;
+import android.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -171,14 +172,20 @@ public class RefreshHelper implements OnOverScrollListener
 
 	public void setRefreshableListView(RefreshableListView l)
 	{
-		this.listView = l;
-		this.listView.setOnOverScrollListener(this);
+		if (l != null)
+		{
+			this.listView = l;
+			this.listView.setOnOverScrollListener(this);
+		}
 	}
 
 	public void setRefreshableScrollView(RefreshableScrollView l)
 	{
-		this.scrollView = l;
-		this.scrollView.setOnOverScrollListener(this);
+		if (l != null)
+		{
+			this.scrollView = l;
+			this.scrollView.setOnOverScrollListener(this);
+		}
 	}
 
 	public static View findActionBar(Window w)
@@ -212,6 +219,34 @@ public class RefreshHelper implements OnOverScrollListener
 		}
 
 		return retView;
+	}
+
+	public static <T extends View> T getFirstChildByInstance(ViewGroup parent, Class<T> instance)
+	{
+		View retView = null;
+		int childCount = parent.getChildCount();
+
+		for (int childIndex = 0; childIndex < childCount; childIndex++)
+		{
+			View child = parent.getChildAt(childIndex);
+
+			if (instance.isAssignableFrom(child.getClass()))
+			{
+				return instance.cast(child);
+			}
+
+			if (child instanceof ViewGroup)
+			{
+				View v = getFirstChildByInstance((ViewGroup)child, instance);
+
+				if (v != null)
+				{
+					return instance.cast(v);
+				}
+			}
+		}
+
+		return instance.cast(retView);
 	}
 
 	/**
@@ -254,6 +289,50 @@ public class RefreshHelper implements OnOverScrollListener
 
 	public static RefreshHelper wrapRefreshable(Activity ctx, RefreshableListView list, OnRefreshListener l)
 	{
+		RefreshHelper helper = wrapRefreshable(ctx, l);
+		helper.setRefreshableListView(list);
+		return helper;
+	}
+
+	public static RefreshHelper wrapRefreshable(Activity ctx, RefreshableScrollView scroll, OnRefreshListener l)
+	{
+		RefreshHelper helper = wrapRefreshable(ctx, l);
+		helper.setRefreshableScrollView(scroll);
+		return helper;
+	}
+
+	public static RefreshHelper wrapRefreshable(Activity ctx, RefreshableListView list, RefreshableScrollView scroll, OnRefreshListener l)
+	{
+		RefreshHelper helper = wrapRefreshable(ctx, l);
+		helper.setRefreshableListView(list);
+		helper.setRefreshableScrollView(scroll);
+		return helper;
+	}
+
+	public static RefreshHelper wrapRefreshable(Fragment fragment, OnRefreshListener l)
+	{
+		RefreshHelper helper = wrapRefreshable(fragment.getActivity(), l);
+
+		RefreshableListView list = getFirstChildByInstance((ViewGroup)fragment.getView(), RefreshableListView.class);
+		RefreshableScrollView scroll = getFirstChildByInstance((ViewGroup)fragment.getView(), RefreshableScrollView.class);
+		helper.setRefreshableListView(list);
+		helper.setRefreshableScrollView(scroll);
+		return helper;
+	}
+
+	public static RefreshHelper wrapRefreshable(View view, OnRefreshListener l)
+	{
+		RefreshHelper helper = wrapRefreshable((Activity)view.getContext(), l);
+
+		RefreshableListView list = getFirstChildByInstance((ViewGroup)view, RefreshableListView.class);
+		RefreshableScrollView scroll = getFirstChildByInstance((ViewGroup)view, RefreshableScrollView.class);
+		helper.setRefreshableListView(list);
+		helper.setRefreshableScrollView(scroll);
+		return helper;
+	}
+
+	public static RefreshHelper wrapRefreshable(Activity ctx, OnRefreshListener l)
+	{
 		ViewGroup abRoot;
 
 		if ((abRoot = (ViewGroup)ctx.getWindow().getDecorView().findViewById(R.id.action_bar_container)) == null)
@@ -271,33 +350,6 @@ public class RefreshHelper implements OnOverScrollListener
 
 			RefreshHelper helper = new RefreshHelper(overlay, progressOverlay, abRoot.getChildAt(0));
 			helper.setOnRefreshListener(l);
-			helper.setRefreshableListView(list);
-			return helper;
-		}
-
-		return null;
-	}
-
-	public static RefreshHelper wrapRefreshable(Activity ctx, RefreshableScrollView list, OnRefreshListener l)
-	{
-		ViewGroup abRoot;
-
-		if ((abRoot = (ViewGroup)ctx.getWindow().getDecorView().findViewById(R.id.action_bar_container)) == null)
-		{
-			abRoot = (ViewGroup)findActionBar(ctx.getWindow());
-		}
-
-		if (abRoot != null)
-		{
-			View overlay = LayoutInflater.from(ctx).inflate(R.layout.abs_overlay, null, false);
-			abRoot.addView(overlay);
-
-			View progressOverlay = LayoutInflater.from(ctx).inflate(R.layout.abs_overlay_progress, null, false);
-			abRoot.addView(progressOverlay);
-
-			RefreshHelper helper = new RefreshHelper(overlay, progressOverlay, abRoot.getChildAt(0));
-			helper.setOnRefreshListener(l);
-			helper.setRefreshableScrollView(list);
 			return helper;
 		}
 
