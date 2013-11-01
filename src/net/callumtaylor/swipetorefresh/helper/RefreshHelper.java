@@ -83,6 +83,14 @@ public class RefreshHelper implements OnOverScrollListener
 		AnimationHelper.pullRefreshActionBar(ptrOverlay, abRoot);
 	}
 
+	/**
+	 * Alias for {@link RefreshHelper#onRefresh()}
+	 */
+	public void refresh()
+	{
+		onRefresh();
+	}
+
 	@Override public void onRefresh()
 	{
 		if (scrollView != null)
