@@ -18,8 +18,8 @@ import android.widget.TextView;
  * This is the refresh helper class which you could call to
  * wrap your refreshable views and activity to.
  *
- * You can call {@link showHelper} to show the indeterminate progress
- * or {@link hideHelper} to hide. This is useful when having more than one
+ * You can call {@link RefreshHelper#showHelper()} to show the indeterminate progress
+ * or {@link RefreshHelper#hideHelper()} to hide. This is useful when having more than one
  * refreshable list fragments in a view pager, call show/hide on the
  * relevant fragment when switching page to prevent multiple refreshables
  * from showing.
@@ -120,6 +120,18 @@ public class RefreshHelper implements OnOverScrollListener
 		ptrProgressBar.setProgress(Math.round(accelerationInterpolator.getInterpolation(percentage) * 100));
 	}
 
+	/**
+	 * Alias for {@link RefreshHelper#onReset()}
+	 */
+	public void finish()
+	{
+		onReset();
+	}
+
+	/**
+	 * You may call this method after the refreshable method has completed
+	 * to reset the ptr functionality
+	 */
 	@Override public void onReset()
 	{
 		refreshing = false;
@@ -188,12 +200,12 @@ public class RefreshHelper implements OnOverScrollListener
 		}
 	}
 
-	public static View findActionBar(Window w)
+	private static View findActionBar(Window w)
 	{
 		return getFirstChildByClassName((ViewGroup)w.getDecorView(), "com.android.internal.widget.ActionBarContainer");
 	}
 
-	public static View getFirstChildByClassName(ViewGroup parent, String name)
+	private static View getFirstChildByClassName(ViewGroup parent, String name)
 	{
 		View retView = null;
 		int childCount = parent.getChildCount();
@@ -221,7 +233,7 @@ public class RefreshHelper implements OnOverScrollListener
 		return retView;
 	}
 
-	public static <T extends View> T getFirstChildByInstance(ViewGroup parent, Class<T> instance)
+	private static <T extends View> T getFirstChildByInstance(ViewGroup parent, Class<T> instance)
 	{
 		View retView = null;
 		int childCount = parent.getChildCount();

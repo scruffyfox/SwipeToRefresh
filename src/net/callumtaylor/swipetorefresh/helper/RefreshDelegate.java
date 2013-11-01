@@ -15,6 +15,9 @@ import android.view.WindowManager;
  * This is the refresh delegate responsible for handling the touch events
  * from the {@link RefreshableListView} and {@link RefreshableScrollView}
  * classes.
+ *
+ * Some code in {@link RefreshDelegate#onTouch(View, MotionEvent)} has been
+ * used from <a href="https://github.com/chrisbanes/ActionBar-PullToRefresh">Chris Banes' Library</a>
  */
 public class RefreshDelegate
 {
