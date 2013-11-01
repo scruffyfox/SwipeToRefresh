@@ -37,6 +37,16 @@ public class RefreshHelper implements OnOverScrollListener
 	private RefreshableScrollView scrollView;
 
 	private boolean refreshing = false;
+	private Runnable reset = new Runnable()
+	{
+		@Override public void run()
+		{
+			if (ptrOverlay.getAnimation() == null)
+			{
+				resetOverlay();
+			}
+		}
+	};
 
 	private RefreshHelper(View overlay, View progressOverlay, View root)
 	{
@@ -108,13 +118,7 @@ public class RefreshHelper implements OnOverScrollListener
 		ptrInderterminateProgressBar.setVisibility(View.VISIBLE);
 		((TextView)ptrOverlay.findViewById(R.id.refresh_text)).setText(R.string.ptr_refreshing);
 
-		ptrOverlay.postDelayed(new Runnable()
-		{
-			@Override public void run()
-			{
-				resetOverlay();
-			}
-		}, 800);
+		ptrOverlay.postDelayed(reset, 800);
 
 		if (refreshListener != null)
 		{
@@ -148,6 +152,7 @@ public class RefreshHelper implements OnOverScrollListener
 			AnimationHelper.fadeOut(ptrInderterminateProgressBar);
 		}
 
+		ptrOverlay.removeCallbacks(reset);
 		resetOverlay();
 
 		if (scrollView != null)
