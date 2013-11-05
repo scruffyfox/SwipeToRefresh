@@ -74,7 +74,7 @@ public class RefreshableListView extends ListView implements View.OnTouchListene
 		else if (getFirstVisiblePosition() <= 0)
 		{
 			final View firstVisibleChild = getChildAt(0);
-			return firstVisibleChild != null && firstVisibleChild.getTop() <= 0;
+			return firstVisibleChild != null && firstVisibleChild.getTop() >= 0;
 		}
 
 		return false;
