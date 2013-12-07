@@ -1,9 +1,5 @@
 package net.callumtaylor.swipetorefresh.helper;
 
-import net.callumtaylor.pulltorefresh.R;
-import net.callumtaylor.swipetorefresh.view.OnOverScrollListener;
-import net.callumtaylor.swipetorefresh.view.RefreshableListView;
-import net.callumtaylor.swipetorefresh.view.RefreshableScrollView;
 import android.app.Activity;
 import android.app.Fragment;
 import android.view.LayoutInflater;
@@ -13,6 +9,11 @@ import android.view.Window;
 import android.view.animation.AccelerateInterpolator;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+
+import net.callumtaylor.pulltorefresh.R;
+import net.callumtaylor.swipetorefresh.view.OnOverScrollListener;
+import net.callumtaylor.swipetorefresh.view.RefreshableListView;
+import net.callumtaylor.swipetorefresh.view.RefreshableScrollView;
 
 /**
  * This is the refresh helper class which you could call to
@@ -28,7 +29,7 @@ public class RefreshHelper implements OnOverScrollListener
 {
 	private final View ptrOverlay;
 
-	private final ProgressBar ptrProgressBar, ptrInderterminateProgressBar;
+	private final ProgressBar ptrProgressBar, ptrIndeterminateProgressBar;
 	private final AccelerateInterpolator accelerationInterpolator;
 	private final View abRoot;
 	private OnRefreshListener refreshListener;
@@ -51,7 +52,7 @@ public class RefreshHelper implements OnOverScrollListener
 	private RefreshHelper(View overlay, View progressOverlay, View root)
 	{
 		this.ptrOverlay = overlay;
-		this.ptrInderterminateProgressBar = (ProgressBar)progressOverlay;
+		this.ptrIndeterminateProgressBar = (ProgressBar)progressOverlay;
 		this.accelerationInterpolator = new AccelerateInterpolator();
 		this.ptrProgressBar = (ProgressBar)overlay.findViewById(R.id.refresh_progress);
 		this.abRoot = root;
@@ -75,7 +76,7 @@ public class RefreshHelper implements OnOverScrollListener
 	{
 		if (isRefreshing())
 		{
-			ptrInderterminateProgressBar.setVisibility(View.GONE);
+			ptrIndeterminateProgressBar.setVisibility(View.GONE);
 		}
 	}
 
@@ -83,7 +84,7 @@ public class RefreshHelper implements OnOverScrollListener
 	{
 		if (isRefreshing())
 		{
-			ptrInderterminateProgressBar.setVisibility(View.VISIBLE);
+			ptrIndeterminateProgressBar.setVisibility(View.VISIBLE);
 		}
 	}
 
@@ -115,7 +116,7 @@ public class RefreshHelper implements OnOverScrollListener
 
 		refreshing = true;
 		ptrProgressBar.setVisibility(View.GONE);
-		ptrInderterminateProgressBar.setVisibility(View.VISIBLE);
+		ptrIndeterminateProgressBar.setVisibility(View.VISIBLE);
 		((TextView)ptrOverlay.findViewById(R.id.refresh_text)).setText(R.string.ptr_refreshing);
 
 		ptrOverlay.postDelayed(reset, 800);
@@ -147,9 +148,9 @@ public class RefreshHelper implements OnOverScrollListener
 	@Override public void onReset()
 	{
 		refreshing = false;
-		if (ptrInderterminateProgressBar.getVisibility() == View.VISIBLE)
+		if (ptrIndeterminateProgressBar.getVisibility() == View.VISIBLE)
 		{
-			AnimationHelper.fadeOut(ptrInderterminateProgressBar);
+			AnimationHelper.fadeOut(ptrIndeterminateProgressBar);
 		}
 
 		ptrOverlay.removeCallbacks(reset);
@@ -303,11 +304,11 @@ public class RefreshHelper implements OnOverScrollListener
 				view = abRoot.findViewById(R.id.refresh_view);
 			}
 
-			View inderterminate = abRoot.findViewById(R.id.refresh_progress_inderterminate);
-			while (inderterminate != null)
+			View indeterminate = abRoot.findViewById(R.id.refresh_progress_indeterminate);
+			while (indeterminate != null)
 			{
-				abRoot.removeView(inderterminate);
-				inderterminate = abRoot.findViewById(R.id.refresh_progress_inderterminate);
+				abRoot.removeView(indeterminate);
+				indeterminate = abRoot.findViewById(R.id.refresh_progress_indeterminate);
 			}
 		}
 	}

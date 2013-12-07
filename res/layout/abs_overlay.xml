@@ -25,7 +25,7 @@
 			android:id="@+id/refresh_progress"
 			android:layout_height="3dp"
 			android:layout_width="match_parent"
-			style="@style/RefreshProgressThemeLight"
+			style="?attr/ptr_progress_style"
 		/>
 	</FrameLayout>
 </RelativeLayout>
