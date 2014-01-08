@@ -10,24 +10,20 @@ import android.widget.ListView;
 
 public class RefreshableListView extends ListView implements View.OnTouchListener, ScrollDelegate
 {
-	private final Context mContext;
 	private boolean mBlockLayoutChildren = false;
 	private boolean canRefresh = true;
+	private int touchDownPos = Integer.MAX_VALUE;
 	public RefreshDelegate refreshDelegate;
 
 	public RefreshableListView(Context context)
 	{
 		super(context);
-		this.mContext = context;
-
 		init();
 	}
 
 	public RefreshableListView(Context context, AttributeSet attrs)
 	{
 		super(context, attrs);
-		this.mContext = context;
-
 		init();
 	}
 
@@ -36,17 +32,22 @@ public class RefreshableListView extends ListView implements View.OnTouchListene
 		return canRefresh;
 	}
 
+	public void setCanRefresh(boolean canRefresh)
+	{
+		this.canRefresh = canRefresh;
+	}
+
 	/**
 	 * Starts a refresh intent only showing the indeterminate progress
 	 */
 	public void indeterminateRefresh()
 	{
-		refreshDelegate.refresh();
+		refreshDelegate.fauxRefresh();
 	}
 
 	private void init()
 	{
-		refreshDelegate = new RefreshDelegate(mContext, this);
+		refreshDelegate = new RefreshDelegate(getContext(), this);
 		setOnTouchListener(this);
 	}
 
@@ -56,7 +57,21 @@ public class RefreshableListView extends ListView implements View.OnTouchListene
 		{
 			return true;
 		}
-		else if (getFirstVisiblePosition() == 0)
+		else if (touchDownPos < 2)
+		{
+			return true;
+		}
+
+		return false;
+	}
+
+	@Override public boolean canStartRefreshing()
+	{
+		if (getCount() == 0)
+		{
+			return true;
+		}
+		else if (getFirstVisiblePosition() <= 0)
 		{
 			final View firstVisibleChild = getChildAt(0);
 			return firstVisibleChild != null && firstVisibleChild.getTop() >= 0;
@@ -80,6 +95,16 @@ public class RefreshableListView extends ListView implements View.OnTouchListene
 
 	@Override public final boolean onTouch(View view, MotionEvent event)
 	{
+		if ((event.getAction() == MotionEvent.ACTION_DOWN)
+		|| (event.getAction() == MotionEvent.ACTION_MOVE && touchDownPos >= Integer.MAX_VALUE))
+		{
+			touchDownPos = getFirstVisiblePosition() - getHeaderViewsCount();
+		}
+		else if (event.getAction() == MotionEvent.ACTION_CANCEL || event.getAction() == MotionEvent.ACTION_UP)
+		{
+			touchDownPos = Integer.MAX_VALUE;
+		}
+
 		if (canRefresh)
 		{
 			refreshDelegate.onTouch(view, event);
@@ -93,11 +118,6 @@ public class RefreshableListView extends ListView implements View.OnTouchListene
 		mBlockLayoutChildren = t;
 	}
 
-	public void setCanRefresh(boolean canRefresh)
-	{
-		this.canRefresh = canRefresh;
-	}
-
 	public void setOnOverScrollListener(OnOverScrollListener l)
 	{
 		refreshDelegate.setOnOverScrollListener(l);
@@ -106,5 +126,10 @@ public class RefreshableListView extends ListView implements View.OnTouchListene
 	public void startRefresh()
 	{
 		refreshDelegate.startRefresh();
+	}
+
+	@Override public void onResetTouch()
+	{
+	//	touchDownPos = Integer.MAX_VALUE;
 	}
 }
