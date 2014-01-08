@@ -10,29 +10,29 @@ import android.widget.ScrollView;
 
 public class RefreshableScrollView extends ScrollView implements View.OnTouchListener, ScrollDelegate
 {
-	private final Context mContext;
-	private int mScrollState;
+	private boolean canRefresh = true;
 	public RefreshDelegate refreshDelegate;
 
 	public RefreshableScrollView(Context context)
 	{
 		super(context);
-		this.mContext = context;
-
 		init();
 	}
 
 	public RefreshableScrollView(Context context, AttributeSet attrs)
 	{
 		super(context, attrs);
-		this.mContext = context;
-
 		init();
 	}
 
-	public int getScrollState()
+	public boolean getCanRefresh()
 	{
-		return mScrollState;
+		return this.canRefresh;
+	}
+
+	public void setCanRefresh(boolean canRefresh)
+	{
+		this.canRefresh = canRefresh;
 	}
 
 	/**
@@ -40,18 +40,23 @@ public class RefreshableScrollView extends ScrollView implements View.OnTouchLis
 	 */
 	public void indeterminateRefresh()
 	{
-		refreshDelegate.refresh();
+		refreshDelegate.fauxRefresh();
 	}
 
 	private void init()
 	{
-		refreshDelegate = new RefreshDelegate(mContext, this);
+		refreshDelegate = new RefreshDelegate(getContext(), this);
 		setOnTouchListener(this);
 	}
 
 	@Override public boolean isScrolledToTop()
 	{
-		return getScrollY() <= 0;
+		return getScrollY() <= 100;
+	}
+
+	@Override public boolean canStartRefreshing()
+	{
+		return isScrolledToTop();
 	}
 
 	public void onRefreshComplete()
@@ -61,7 +66,11 @@ public class RefreshableScrollView extends ScrollView implements View.OnTouchLis
 
 	@Override public final boolean onTouch(View view, MotionEvent event)
 	{
-		refreshDelegate.onTouch(view, event);
+		if (canRefresh)
+		{
+			refreshDelegate.onTouch(view, event);
+		}
+
 		return false;
 	}
 
@@ -74,4 +83,6 @@ public class RefreshableScrollView extends ScrollView implements View.OnTouchLis
 	{
 		refreshDelegate.startRefresh();
 	}
+
+	@Override public void onResetTouch(){}
 }

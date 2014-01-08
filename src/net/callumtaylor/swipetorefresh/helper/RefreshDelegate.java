@@ -1,6 +1,8 @@
 package net.callumtaylor.swipetorefresh.helper;
 
 import net.callumtaylor.swipetorefresh.view.OnOverScrollListener;
+import net.callumtaylor.swipetorefresh.view.RefreshableListView;
+import net.callumtaylor.swipetorefresh.view.RefreshableScrollView;
 import android.content.Context;
 import android.util.DisplayMetrics;
 import android.view.Display;
@@ -9,24 +11,47 @@ import android.view.View;
 import android.view.ViewConfiguration;
 import android.view.WindowManager;
 
+/**
+ * This is the refresh delegate responsible for handling the touch events
+ * from the {@link RefreshableListView} and {@link RefreshableScrollView}
+ * classes.
+ *
+ * Some code in {@link RefreshDelegate#onTouch(View, MotionEvent)} has been
+ * used from <a href="https://github.com/chrisbanes/ActionBar-PullToRefresh">Chris Banes' Library</a>
+ */
 public class RefreshDelegate
 {
+	private final DisplayMetrics mDM;
 	private Context mContext;
 
 	private ScrollDelegate scrollDelegate;
 	private OnOverScrollListener onOverScrollListener;
 
+	private int refreshCount = 0;
 	private int mTouchSlop;
-	private final float mRefreshScrollDistance = 500;
 	private float mInitialMotionY, mLastMotionY;
 	private boolean mIsBeingDragged, mIsRefreshing, mIsHandlingTouchEvent;
-	private long lastRefreshed = 0L;
 
 	public RefreshDelegate(Context context, ScrollDelegate scrollDelegate)
 	{
 		this.scrollDelegate = scrollDelegate;
 		mContext = context;
 		mTouchSlop = ViewConfiguration.get(mContext).getScaledTouchSlop();
+
+		mDM = new DisplayMetrics();
+		WindowManager window = (WindowManager)context.getSystemService(Context.WINDOW_SERVICE);
+		Display display = window.getDefaultDisplay();
+		display.getMetrics(mDM);
+	}
+
+	public void setScrollDeletage(ScrollDelegate delegate)
+	{
+		this.scrollDelegate = delegate;
+	}
+
+	public void setOnOverScrollListener(OnOverScrollListener l)
+	{
+		this.onOverScrollListener = l;
 	}
 
 	private boolean canRefresh(boolean fromTouch)
@@ -36,12 +61,7 @@ public class RefreshDelegate
 
 	private void onPull()
 	{
-		DisplayMetrics dm = new DisplayMetrics();
-		WindowManager window = (WindowManager)mContext.getSystemService(Context.WINDOW_SERVICE);
-		Display display = window.getDefaultDisplay();
-		display.getMetrics(dm);
-
-		final float pxScrollForRefresh = dm.heightPixels / 2.5f;
+		final float pxScrollForRefresh = Math.min(mDM.heightPixels / 3f, densityPixel(300));
 		final float scrollLength = mLastMotionY - mInitialMotionY;
 
 		if (scrollLength < pxScrollForRefresh)
@@ -50,6 +70,7 @@ public class RefreshDelegate
 		}
 		else
 		{
+			refreshCount++;
 			refresh();
 		}
 	}
@@ -58,7 +79,8 @@ public class RefreshDelegate
 	{
 		if (!mIsRefreshing)
 		{
-			onRefreshComplete();
+			onOverScrollListener.onReset();
+			//onRefreshComplete();
 		}
 	}
 
@@ -77,7 +99,7 @@ public class RefreshDelegate
 	{
 		if (onOverScrollListener != null)
 		{
-			onOverScrollListener.onReset();
+			//onOverScrollListener.onReset();
 		}
 
 		mIsRefreshing = false;
@@ -96,9 +118,15 @@ public class RefreshDelegate
 		{
 			case MotionEvent.ACTION_MOVE:
 			{
-				// If we're already refreshing ignore it
+				if (refreshCount > 0) return false;
+
 				if (mIsRefreshing)
 				{
+					if (!scrollDelegate.isScrolledToTop())
+					{
+						resetTouch();
+					}
+
 					return false;
 				}
 
@@ -109,7 +137,7 @@ public class RefreshDelegate
 				// whether we should handle the event
 				if (!mIsHandlingTouchEvent)
 				{
-					if (canRefresh(true) && scrollDelegate.isScrolledToTop())
+					if (canRefresh(true) && scrollDelegate.canStartRefreshing())
 					{
 						mIsHandlingTouchEvent = true;
 						mInitialMotionY = y;
@@ -152,6 +180,11 @@ public class RefreshDelegate
 						resetTouch();
 					}
 				}
+				else if (!scrollDelegate.isScrolledToTop())
+				{
+					onRefreshComplete();
+				}
+
 				break;
 			}
 
@@ -160,15 +193,21 @@ public class RefreshDelegate
 				// If we're already refreshing, ignore
 				if (canRefresh(true) && scrollDelegate.isScrolledToTop())
 				{
-					mIsHandlingTouchEvent = true;
+					mIsHandlingTouchEvent = false;
 					mInitialMotionY = event.getY();
 				}
+				else
+				{
+					mIsHandlingTouchEvent = false;
+				}
+
 				break;
 			}
 
 			case MotionEvent.ACTION_CANCEL:
 			case MotionEvent.ACTION_UP:
 			{
+				refreshCount = 0;
 				resetTouch();
 				break;
 			}
@@ -177,12 +216,23 @@ public class RefreshDelegate
 		return false;
 	}
 
+	public void fauxRefresh()
+	{
+		if (onOverScrollListener != null)
+		{
+			mIsRefreshing = true;
+		}
+		else
+		{
+			onRefreshComplete();
+		}
+	}
+
 	public void refresh()
 	{
 		if (onOverScrollListener != null)
 		{
 			mIsRefreshing = true;
-			lastRefreshed = System.currentTimeMillis();
 			onOverScrollListener.onRefresh();
 		}
 		else
@@ -202,16 +252,11 @@ public class RefreshDelegate
 
 		mIsHandlingTouchEvent = false;
 		mInitialMotionY = mLastMotionY = 0f;
-	}
 
-	public void setOnOverScrollListener(OnOverScrollListener listener)
-	{
-		onOverScrollListener = listener;
-	}
-
-	public void setScrollDelegate(ScrollDelegate delegate)
-	{
-		this.scrollDelegate = delegate;
+		if (scrollDelegate != null)
+		{
+			scrollDelegate.onResetTouch();
+		}
 	}
 
 	/**
@@ -219,12 +264,35 @@ public class RefreshDelegate
 	 */
 	public void startRefresh()
 	{
-		//onPullStarted();
 		refresh();
+	}
+
+	public int densityPixel(int dp)
+	{
+		int pixels = (int)(dp * mDM.density);
+		return pixels;
 	}
 
 	public static interface ScrollDelegate
 	{
+		/**
+		 * This is whats called on initial touch if when {@link canStartRefreshing}
+		 * returns true, to begin the refreshing motion
+		 * @return
+		 */
 		public boolean isScrolledToTop();
+
+		/**
+		 * This is called during the move event to make sure we can still refresh.
+		 * This check should be to ensure that the list is fully at the top before
+		 * any refresh functionality will begin
+		 * @return
+		 */
+		public boolean canStartRefreshing();
+
+		/**
+		 * Called when the touch event is reset
+		 */
+		public void onResetTouch();
 	}
 }
