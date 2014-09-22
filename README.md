@@ -1,6 +1,12 @@
 #README
 
-To use the library:
+##Usage
+
+Simply import the gradle file into Android Studio and reference the dependancy in your `settings.gradle` and project's `build.gradle`
+
+Alternatively you can add the maven dependancy `net.callumtaylor:swipetorefresh:1.1`
+
+###To use the library
 
 In your XML, include the `RefreshableListView`
 
@@ -16,7 +22,7 @@ In your XML, include the `RefreshableListView`
 
 Implement `OnRefreshListener` in your fragment
 
-And in your fragment, in `onActivityCreate` add
+And in your fragment, in `onActivityCreated` add
 
 ```java
 refreshHelper = RefreshHelper.wrapRefreshable(getActivity(), (RefreshableListView)getListView(), this);
